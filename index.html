@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Snow Globe</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Calibri;
+        }
+
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('background-removebg-preview.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0.45;
+            z-index: -1;
+        }
+
+
+        main {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-weight: normal;
+        }
+
+        .template-pics {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .template-pic-container {
+            display: inline-block;
+            text-align: center;
+        }
+
+        .template-pic {
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            border: 2px solid beige;
+            border-radius: 10px;
+            object-fit: cover;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .template-pic:hover {
+            border-color: #FFD700;
+            transform: scale(1.05);
+        }
+
+        .template-caption {
+            font-size: 16px;
+            color: black;
+            margin-top: 8px;
+        }
+
+        #submitBtn {
+            display: inline-block;
+            background-color: #5ea1ed;
+            color: white;
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background-color 0.3s;
+        }
+
+        #submitBtn:hover {
+            background-color: #408de4;
+        }
+
+        #message {
+            margin-top: 20px;
+            color: black;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-overlay"></div>
+
+    <main>
+        <h1>Welcome to my Snow Globe simulator!</h1>
+
+        <div id="templatePics" style="display: block;">
+            <h3>Choose a Template Picture:</h3>
+            <div class="template-pics">
+                <div class="template-pic-container">
+                    <img src="cottage1.jpg" alt="Winter Carnival" class="template-pic" onclick="selectTemplate(this)">
+                    <div class="template-caption">Winter Carnival</div>
+                </div>
+                <div class="template-pic-container">
+                    <img src="cottage2.webp" alt="Warm Cottage" class="template-pic" onclick="selectTemplate(this)">
+                    <div class="template-caption">Warm Cottage</div>
+                </div>
+                <div class="template-pic-container">
+                    <img src="ski3.jpg" alt="Ski Trip" class="template-pic" onclick="selectTemplate(this)">
+                    <div class="template-caption">Ski Trip</div>
+                </div>
+            </div>
+            <div id="message" style="margin-top: 20px; color: black;"></div>
+        </div>
+
+        <button id="submitBtn" type="button" onclick="submitSelection()">Enter Simulation!</button>
+    </main>
+
+    <script>
+        function selectTemplate(img) {
+            let images = document.querySelectorAll('.template-pic');
+            images.forEach(image => image.classList.remove('highlight'));
+            img.classList.add('highlight');
+            document.getElementById('message').innerHTML = "<strong> Selected Template: </strong>" + img.alt;
+            document.getElementById('submitBtn').style.display = 'inline-block';
+
+            localStorage.setItem('selectedTemplate', img.src);
+        }
+
+        function submitSelection() {
+            const selectedTemplate = localStorage.getItem('selectedTemplate');
+
+            if (selectedTemplate) {
+                window.location.href = 'globe.html';
+            } else {
+                alert("Please select a template or upload an image.");
+            }
+        }
+    </script>
+</body>
+
+</html>

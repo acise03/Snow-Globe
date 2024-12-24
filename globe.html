@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Snow Globe</title>
+    <style>
+        body {
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background-color: rgb(4, 10, 24);
+            font-family: 'Arial', sans-serif;
+        }
+
+        canvas {
+            margin: 50px;
+            display: block;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: rgba(145, 203, 242, 0.8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #408de4;
+            transform: translateY(-3px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 5px #408de4;
+        }
+
+        @media (max-width: 768px) {
+            canvas {
+                margin: 20px;
+            }
+
+            .buttons {
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        #instructions {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #5ea1ed;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            z-index: 100;
+            width: auto;
+            opacity: 90%;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <canvas id="myCanvas"></canvas>
+
+        <div class="buttons">
+            <button id="clearButton">Clear Snowfall</button>
+            <button id="selectPics">Select a Different Picture</button>
+        </div>
+        <div id="instructions">
+            Click the snow globe (picture) to make it snow!
+        </div>
+
+
+        <script>
+            const canvas = document.getElementById("myCanvas");
+            const ctx = canvas.getContext("2d");
+
+            const margin = 50;
+            canvas.width = window.innerWidth - 2 * margin;
+            canvas.height = window.innerHeight - 2 * margin;
+
+            const cX = canvas.width / 2;
+            const cY = canvas.height / 2;
+            const radius = Math.min(canvas.width, canvas.height) / 2;
+
+            let snowflakes = [];
+            let numSn = 100;
+
+            class Snowflake {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 4 + 1;
+                    this.speed = Math.random() * 3 + 0.75;
+                    this.opacity = Math.random() * 0.5 + 0.3;
+                }
+
+                update() {
+                    this.y += this.speed;
+                    if (this.y > canvas.height) {
+                        this.y = -this.size;
+                        this.x = Math.random() * canvas.width;
+                    }
+                }
+
+                show() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.fill();
+                }
+            }
+
+            function create() {
+                for (let i = 0; i < numSn; i++) {
+                    snowflakes.push(new Snowflake());
+                }
+            }
+
+            create();
+
+            const imageUrl = localStorage.getItem('selectedTemplate') || localStorage.getItem('uploadedImage');
+            let img, offsetX, offsetY, imgWidth, imgHeight;
+
+            img = new Image();
+            img.src = imageUrl;
+
+            img.onload = () => {
+                const aspectRatio = img.width / img.height;
+
+                imgWidth = canvas.width;
+                imgHeight = canvas.width / aspectRatio;
+
+                if (imgHeight < canvas.height) {
+                    imgHeight = canvas.height;
+                    imgWidth = canvas.height * aspectRatio;
+                }
+
+                offsetX = (canvas.width - imgWidth) / 2;
+                offsetY = (canvas.height - imgHeight) / 2;
+
+                drawImageOnly();
+
+                canvas.addEventListener("click", increaseSnowfall);
+            };
+
+
+            function drawImageOnly() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.beginPath();
+                ctx.arc(cX, cY, radius, 0, 2 * Math.PI);
+                ctx.clip();
+
+                if (img) {
+                    ctx.drawImage(img, offsetX, offsetY, imgWidth, imgHeight);
+                }
+
+                ctx.restore();
+            }
+
+            function increaseSnowfall() {
+                numSn += 25;
+                create();
+
+
+                if (!AS) {
+                    AS = true;
+                    animateSnowfall();
+                }
+            }
+
+            let AS = false;
+
+            function animateSnowfall() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.beginPath();
+                ctx.arc(cX, cY, radius, 0, 2 * Math.PI);
+                ctx.clip();
+
+                if (img) {
+                    ctx.drawImage(img, offsetX, offsetY, imgWidth, imgHeight);
+                }
+
+                ctx.restore();
+
+                for (let i = 0; i < snowflakes.length; i++) {
+                    snowflakes[i].update();
+                    snowflakes[i].show();
+                }
+
+                requestAnimationFrame(animateSnowfall);
+            }
+
+            function clear() {
+                snowflakes = [];
+                numSn = 0;
+                AS = false;
+                drawImageOnly();
+            }
+
+            function selectDiffPics() {
+                window.location.href = 'index.html';
+            }
+
+            const clearButton = document.getElementById("clearButton");
+            const selectPicsButton = document.getElementById("selectPics");
+
+            clearButton.addEventListener("click", clear);
+            selectPicsButton.addEventListener("click", selectDiffPics);
+        </script>
+    </main>
+</body>
+
+</html>
