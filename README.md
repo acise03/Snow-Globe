@@ -9,6 +9,6 @@ Snow Globe is an online simulation of a snow globe. It aims to help users visual
 - Feature 3: Realistic simulation
 
 ## Usage
-To use Snow Globe, simply visit the site: [https://acise314.github.io/Snow-Globe/index.html](https://acise314.github.io/Snow-Globe/index.html)
+To use Snow Globe, simply visit the site: [https://acise03.github.io/Snow-Globe/index.html](https://acise03.github.io/Snow-Globe/index.html)
 
 Hope you enjoy using Snow Globe!
